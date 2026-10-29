@@ -1,0 +1,72 @@
+{
+ "frequency-sunrise-7abh": {
+  "title": "Frequency Sunrise",
+  "banner": "banners/frequency-sunrise-7abh.jpg",
+  "desc": "Marina Deck · הרצליה"
+ },
+ "open-air-6w8u": {
+  "title": "Open Air",
+  "banner": "banners/open-air-6w8u.jpg",
+  "desc": "Beach Stage · הרצליה"
+ },
+ "event-e674": {
+  "title": "ערב מזרחי גדול",
+  "banner": "banners/event-e674.jpg",
+  "desc": "Rishon Live Hall · ראשון לציון"
+ },
+ "last-laugh-bk8i": {
+  "title": "Last Laugh",
+  "banner": "banners/last-laugh-bk8i.jpg",
+  "desc": "Carmel Comedy Club · חיפה"
+ },
+ "event-b7bv": {
+  "title": "הופעה חיה",
+  "banner": "banners/event-b7bv.jpg",
+  "desc": "Haifa Stage · חיפה"
+ },
+ "psychedelic-voyage-ul2d": {
+  "title": "Psychedelic Voyage",
+  "banner": "banners/psychedelic-voyage-ul2d.jpg",
+  "desc": "Jordan River Camp · גליל עליון"
+ },
+ "event-au5p": {
+  "title": "תת קרקע",
+  "banner": "banners/event-au5p.jpg",
+  "desc": "Level -2 · תל אביב"
+ },
+ "cocktails-bass-pim5": {
+  "title": "Cocktails & Bass",
+  "banner": "banners/cocktails-bass-pim5.jpg",
+  "desc": "Marina Lounge · נתניה"
+ },
+ "47-go6i": {
+  "title": "מחסן 47",
+  "banner": "banners/47-go6i.jpg",
+  "desc": "Warehouse 47 · תל אביב"
+ },
+ "desert-frequency-miox": {
+  "title": "Desert Frequency",
+  "banner": "banners/desert-frequency-miox.jpg",
+  "desc": "Negev Open Ground · באר שבע"
+ },
+ "hip-hop-night-ft-ido-feral-24lw": {
+  "title": "Hip-Hop Night ft. Ido Feral",
+  "banner": "banners/hip-hop-night-ft-ido-feral-24lw.jpg",
+  "desc": "Hall 7 · ירושלים"
+ },
+ "beach-party-33wn": {
+  "title": "Beach Party",
+  "banner": "banners/beach-party-33wn.jpg",
+  "desc": "Red Sea Deck · אילת"
+ },
+ "event-l1ht": {
+  "title": "חול ובס",
+  "banner": "banners/event-l1ht.jpg",
+  "desc": "Bat Yam Beach Club · בת ים"
+ },
+ "event-l1v1": {
+  "title": "פסטיבל המכתש",
+  "banner": "banners/event-l1v1.jpg",
+  "desc": "Crater Edge · מצפה רמון"
+ }
+}

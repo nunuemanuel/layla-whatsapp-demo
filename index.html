@@ -1,0 +1,329 @@
+<!doctype html>
+<!--
+ ♥ made with love — mano ♥
+-->
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f0f2f5">
+<title>Layla · סוכן וואטסאפ</title>
+<meta name="description" content="הדגמה של סוכן AI בוואטסאפ: מוצא אירועים, עונה על שאלות, שולח הנחות ולינק לקנייה.">
+<meta property="og:title" content="Layla · סוכן וואטסאפ">
+<meta property="og:description" content="הדגמה חיה של סוכן AI בוואטסאפ">
+<meta property="og:image" content="assets/og.png">
+<link rel="icon" href="assets/avatar.jpg">
+<link rel="apple-touch-icon" href="assets/avatar.jpg">
+<style>
+  :root {
+    --bar: #f0f2f5;
+    --wall: #efeae2;
+    --in: #ffffff;
+    --out: #d9fdd3;
+    --text: #111b21;
+    --muted: #667781;
+    --icon: #54656f;
+    --green: #00a884;
+    --link: #027eb5;
+    --tick: #53bdeb;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; font-family: var(--font); color: var(--text); }
+  body { background: #e9edef; }
+
+  /* Desktop: the chat sits in a phone, with a short explanation beside it. */
+  .stage { min-height: 100%; display: flex; align-items: center; justify-content: center; gap: 64px; padding: 32px; }
+  .side { max-width: 340px; }
+  .side .logo { width: 56px; height: 56px; border-radius: 14px; display: block; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(26,14,34,.18); }
+  .side h1 { font-size: 30px; line-height: 1.2; margin: 0 0 12px; letter-spacing: -.3px; }
+  .side p { font-size: 16px; line-height: 1.6; color: #3b4a54; margin: 0 0 10px; }
+  .side .hint { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; background: #fff; border-radius: 999px; padding: 8px 14px; font-size: 14px; color: #3b4a54; box-shadow: 0 1px 2px rgba(11,20,26,.12); }
+  .side .hint i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 1.6s infinite; }
+  .side .fine { font-size: 12.5px; color: var(--muted); margin-top: 22px; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+
+  .device { width: 390px; height: 844px; border-radius: 56px; background: #0b0b0c; padding: 12px; box-shadow: 0 30px 60px rgba(11,20,26,.28), inset 0 0 0 2px #2a2a2c; position: relative; flex: none; }
+  .screen { width: 100%; height: 100%; border-radius: 44px; overflow: hidden; position: relative; display: flex; flex-direction: column; background: var(--wall); }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 122px; height: 34px; border-radius: 20px; background: #000; z-index: 5; }
+  .statusbar { height: 50px; flex: none; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 30px 6px; background: var(--bar); font-size: 15px; font-weight: 600; direction: ltr; }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+
+  /* Phone-size browser: the chat is the page. */
+  @media (max-width: 760px) {
+    body { background: var(--wall); }
+    .stage { padding: 0; display: block; }
+    .side { display: none; }
+    .device { width: 100%; height: 100dvh; border-radius: 0; padding: 0; box-shadow: none; }
+    .screen { border-radius: 0; }
+    .island, .statusbar { display: none; }
+  }
+  body.bare .side, body.bare .island { display: none; }
+  body.bare .stage { padding: 0; }
+  body.bare .device { border-radius: 0; padding: 0; box-shadow: none; height: 100dvh; width: 100vw; max-width: 430px; }
+  body.bare .screen { border-radius: 0; }
+
+  header { display: flex; align-items: center; gap: 10px; padding: 6px 10px 8px; background: var(--bar); border-bottom: 1px solid #e3e6e8; flex: none; }
+  header .back { display: flex; align-items: center; color: #007aff; }
+  header .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+  header .who { flex: 1; min-width: 0; line-height: 1.2; }
+  header .name { font-weight: 600; font-size: 16.5px; display: flex; align-items: center; gap: 5px; }
+  header .status { font-size: 12.5px; color: var(--muted); transition: color .2s; }
+  header .status.typing { color: var(--green); }
+  header .acts { display: flex; gap: 20px; color: #007aff; padding-inline-end: 4px; }
+
+  #chat { flex: 1; overflow-y: auto; padding: 10px 12px 8px; scroll-behavior: smooth;
+    background-color: var(--wall);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23b6ab9c' stroke-opacity='.28' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 30v-14l12-3v14'/%3E%3Ccircle cx='19' cy='30' r='3'/%3E%3Ccircle cx='31' cy='27' r='3'/%3E%3Cpath d='M118 20l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z'/%3E%3Cpath d='M70 70c0-6 9-6 9 0 0-6 9-6 9 0 0 7-9 12-9 12s-9-5-9-12z'/%3E%3Cpath d='M128 92h16l-3 16h-10z'/%3E%3Cpath d='M141 96h4a3 3 0 010 6h-3'/%3E%3Ccircle cx='30' cy='112' r='9'/%3E%3Cpath d='M26 110h.01M34 110h.01M26 115c2 2 6 2 8 0'/%3E%3Cpath d='M86 130l10-10M91 120h5v5'/%3E%3Cpath d='M60 18c4-6 12-6 14 2'/%3E%3Cpath d='M100 150l6-12 6 12z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 160px 160px; }
+  .day { text-align: center; margin: 6px 0 10px; }
+  .day span { background: #fff; color: #54656f; font-size: 12.5px; padding: 5px 12px; border-radius: 8px; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
+  .notice { display: flex; gap: 6px; background: #ffeecd; color: #54656f; font-size: 12.5px; line-height: 1.45; text-align: center; padding: 7px 12px; border-radius: 8px; margin: 0 10px 8px; box-shadow: 0 1px .5px rgba(11,20,26,.13); justify-content: center; }
+  .bizcard { background: #fff; border-radius: 10px; margin: 2px 26px 12px; padding: 14px 12px 12px; text-align: center; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
+  .bizcard img { width: 64px; height: 64px; border-radius: 50%; display: block; margin: 0 auto 8px; }
+  .bizcard b { font-size: 16px; display: inline-flex; align-items: center; gap: 4px; }
+  .bizcard div { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+
+  .row { display: flex; margin: 2px 0; }
+  .row.in { justify-content: flex-start; }
+  .row.out { justify-content: flex-end; }
+  .row + .row.in, .row + .row.out { margin-top: 2px; }
+  .row.first { margin-top: 10px; }
+  .bubble { max-width: 84%; padding: 6px 8px 7px 9px; border-radius: 8px; font-size: 15px; line-height: 1.38; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: 0 1px .5px rgba(11,20,26,.13); position: relative; animation: pop .18s ease-out; }
+  @keyframes pop { from { transform: translateY(6px) scale(.98); opacity: 0 } to { transform: none; opacity: 1 } }
+  .in .bubble { background: var(--in); }
+  .out .bubble { background: var(--out); }
+  .row.first.in .bubble { border-start-start-radius: 0; }
+  .row.first.out .bubble { border-start-end-radius: 0; }
+  .row.first.in .bubble::before, .row.first.out .bubble::before { content: ""; position: absolute; top: 0; width: 8px; height: 13px; }
+  .row.first.in .bubble::before { inset-inline-start: -8px; background: var(--in); clip-path: polygon(100% 0, 0 0, 100% 100%); }
+  .row.first.out .bubble::before { inset-inline-end: -8px; background: var(--out); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .bubble a { color: var(--link); text-decoration: none; word-break: break-all; }
+  .bubble b { font-weight: 600; }
+  .meta { float: inline-end; margin-inline-start: 10px; margin-top: 7px; margin-bottom: -4px; font-size: 11px; color: var(--muted); direction: ltr; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+  .meta svg { color: var(--tick); }
+  .preview { display: block; margin: -2px -4px 6px; border-radius: 6px; overflow: hidden; background: #f5f6f6; color: inherit; text-decoration: none; }
+  .out .preview { background: #c9eec2; }
+  .preview img { width: 100%; height: 150px; object-fit: cover; display: block; }
+  .preview .pt { padding: 6px 9px 8px; }
+  .preview .pt b { display: block; font-size: 14px; color: var(--text); font-weight: 600; }
+  .preview .pt span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; white-space: normal; }
+  .preview .pt em { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 3px; direction: ltr; text-align: end; }
+
+  .typingrow .bubble { display: inline-flex; gap: 4px; align-items: center; padding: 12px 13px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #8696a0; animation: blink 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: .2s; } .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .3 } 40% { opacity: 1 } }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 10px 2px; background: var(--wall); flex: none; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 1px solid #d1d7db; background: #fff; color: #008069; font: inherit; font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 18px; cursor: pointer; box-shadow: 0 1px .5px rgba(11,20,26,.08); white-space: nowrap; }
+  .chip:hover { background: #f5fbf9; }
+  .chip.next { background: #008069; color: #fff; border-color: #008069; }
+  .chips.hidden { display: none; }
+  .chiplabel { font-size: 12px; color: var(--muted); padding: 6px 14px 0; background: var(--wall); flex: none; }
+
+  footer { display: flex; align-items: center; gap: 10px; padding: 6px 10px 8px; background: var(--bar); flex: none; }
+  footer .plus, footer .cam, footer .mic { color: #007aff; display: flex; }
+  footer .field { flex: 1; min-height: 36px; border-radius: 18px; background: #fff; border: 1px solid #e3e6e8; display: flex; align-items: center; padding: 6px 12px; font-size: 15.5px; gap: 8px; }
+  footer .field .ph { color: #8696a0; }
+  footer .field .typed { color: var(--text); }
+  footer .field .caret { width: 1.5px; height: 18px; background: #007aff; animation: caret 1s steps(1) infinite; }
+  @keyframes caret { 50% { opacity: 0 } }
+  footer .send { width: 34px; height: 34px; border-radius: 50%; background: var(--green); color: #fff; display: none; place-items: center; }
+  footer.has-text .send { display: grid; }
+  footer.has-text .cam, footer.has-text .mic { display: none; }
+  .homebar { height: 22px; background: var(--bar); flex: none; display: flex; justify-content: center; align-items: center; }
+  .homebar i { width: 134px; height: 5px; border-radius: 3px; background: #111; opacity: .85; }
+  @media (max-width: 760px) { .homebar { height: calc(6px + env(safe-area-inset-bottom)); } .homebar i { display: none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device">
+    <div class="island" aria-hidden="true"></div>
+    <div class="screen">
+      <div class="statusbar" aria-hidden="true">
+        <span id="clock">21:47</span>
+        <span class="icons">
+          <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#111"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#111"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#111"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#111"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5l2.4-2.9a3.4 3.4 0 00-4.8 0z" fill="#111"/><path d="M3.7 6.4a6.2 6.2 0 018.6 0l1.4-1.6a8.3 8.3 0 00-11.4 0z" fill="#111"/><path d="M1 3.4a10 10 0 0114 0L16 2.1A11.8 11.8 0 000 2.1z" fill="#111"/></svg>
+          <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#111" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#111"/><rect x="24.5" y="4.5" width="2" height="4" rx="1" fill="#111" opacity=".4"/></svg>
+        </span>
+      </div>
+      <header>
+        <span class="back" aria-hidden="true"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <img class="avatar" src="assets/avatar.jpg" alt="Layla">
+        <div class="who">
+          <div class="name">Layla <svg width="16" height="16" viewBox="0 0 24 24" aria-label="עסק מאומת"><path fill="#00a884" d="M12 1l2.6 2.1 3.3-.3 1 3.2 2.9 1.7-.9 3.2L22.4 14l-2.4 2.3.1 3.3-3.2.8-1.7 2.9-3.2-1.1L9 23.4l-2.3-2.4-3.3.1-.8-3.2L0 16.2l1.1-3.2L0 9.9l2.9-1.6.8-3.3 3.3.1L9 .6z"/><path d="M7.5 12.3l3 3 6-6.2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="status" id="status">חשבון עסקי</div>
+        </div>
+        <span class="acts" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M15 10.5l6-3.5v10l-6-3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24"><path d="M5 3h3.5l2 5-2.5 1.5a11 11 0 006.5 6.5L16 13.5l5 2V19a2 2 0 01-2 2A17 17 0 013 5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+        </span>
+      </header>
+      <main id="chat" aria-live="polite">
+        <div class="day"><span>היום</span></div>
+        <div class="notice">🔒 ההודעות והשיחות מוצפנות מקצה לקצה. העסק משתמש בשירות מאובטח של Meta לניהול הצ׳אט.</div>
+        <div class="bizcard">
+          <img src="assets/avatar.jpg" alt="">
+          <b>Layla</b>
+          <div>כרטיסים למסיבות, פסטיבלים והופעות<br>חשבון עסקי · עוזר אוטומטי</div>
+        </div>
+      </main>
+      <div class="chiplabel" id="chiplabel">בחרו הודעה כדי לנסות:</div>
+      <div class="chips" id="chips"></div>
+      <footer id="composer">
+        <span class="plus" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <div class="field"><span class="typed" id="typed"></span><span class="caret" id="caret" hidden></span><span class="ph" id="ph">הודעה</span></div>
+        <span class="cam" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.9"/></svg></span>
+        <span class="mic" aria-hidden="true"><svg width="22" height="24" viewBox="0 0 22 24"><rect x="7" y="2" width="8" height="13" rx="4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 11a7.5 7.5 0 0015 0M11 18.5V22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
+        <span class="send" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 20l18-8L3 4l2 8z" fill="#fff"/></svg></span>
+      </footer>
+      <div class="homebar" aria-hidden="true"><i></i></div>
+    </div>
+  </div>
+  <aside class="side">
+    <img class="logo" src="assets/avatar.jpg" alt="">
+    <h1>סוכן וואטסאפ<br>חכם לעסק</h1>
+    <p>ככה נראית שיחה עם הסוכן של Layla: הוא מוצא אירועים, עונה על שאלות, שולח קוד הנחה ולינק לקנייה, ומזהה לקוחות קיימים.</p>
+    <p>בחרו הודעה מתחתית הצ׳אט וראו איך הוא עונה.</p>
+    <span class="hint"><i></i> התשובות הן של הסוכן עצמו</span>
+    <p class="fine">הדגמה: האירועים והמחירים אמיתיים מהאתר של Layla. קודי ההנחה והלקוחה הם לדוגמה.</p>
+  </aside>
+</div>
+<script>
+(async () => {
+  const params = new URLSearchParams(location.search);
+  if (params.get('bare') === '1') document.body.classList.add('bare');
+  const [convos, banners] = await Promise.all([
+    fetch('conversations.json').then((r) => r.json()),
+    fetch('assets/banners/meta.json').then((r) => r.json()),
+  ]);
+  const ORDER = ['1-weekend', '2-discount', '3-festival', '4-my-tickets', '5-support', '6-english'];
+  convos.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
+
+  const chat = document.getElementById('chat');
+  const chips = document.getElementById('chips');
+  const chipLabel = document.getElementById('chiplabel');
+  const statusEl = document.getElementById('status');
+  const composer = document.getElementById('composer');
+  const typedEl = document.getElementById('typed');
+  const caret = document.getElementById('caret');
+  const ph = document.getElementById('ph');
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let clockMin = 21 * 60 + 47;
+  const clock = () => `${String(Math.floor(clockMin / 60) % 24).padStart(2, '0')}:${String(clockMin % 60).padStart(2, '0')}`;
+  document.getElementById('clock').textContent = clock();
+  let lastRole = null;
+  let busy = false;
+
+  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const TICKS = '<svg width="16" height="11" viewBox="0 0 16 11"><path d="M1 6l3 3 6-7M6 9l1 1 7-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function previewFor(url) {
+    const m = url.match(/\/events\/([^?\s/]+)/);
+    if (m && banners[m[1]]) {
+      const b = banners[m[1]];
+      return `<a class="preview" href="${url}" target="_blank" rel="noopener"><img src="assets/${b.banner}" alt=""><div class="pt"><b dir="auto">${esc(b.title)} | Layla</b><span dir="auto">${esc(b.desc || 'כרטיסים ב-Layla')}</span><em>layla.events</em></div></a>`;
+    }
+    if (/my-tickets/.test(url)) {
+      return `<a class="preview" href="${url}" target="_blank" rel="noopener"><img src="assets/og.png" alt=""><div class="pt"><b>הכרטיסים שלי | Layla</b><span>כל הכרטיסים שלכם במקום אחד</span><em>layla.events</em></div></a>`;
+    }
+    return '';
+  }
+  function render(text) {
+    const first = (text.match(/https?:\/\/[^\s]+/) || [])[0];
+    let h = esc(text);
+    h = h.replace(/https?:\/\/[^\s]+/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+    h = h.replace(/(^|[\s(\-–:,"״'לבמהושכ])\*([^*\n]+?)\*(?=$|[\s.,:;)?\-–"״'])/g, '$1<b>$2</b>');
+    return (first ? previewFor(first) : '') + h;
+  }
+  function addBubble(role, text) {
+    const row = document.createElement('div');
+    row.className = `row ${role === 'user' ? 'out' : 'in'}${lastRole !== role ? ' first' : ''}`;
+    lastRole = role;
+    const meta = `<span class="meta">${clock()}${role === 'user' ? TICKS : ''}</span>`;
+    // The message's own language sets the direction (a Latin preview title must not flip a Hebrew message).
+    const dir = /[\u05D0-\u05EA]/.test(text) ? 'rtl' : 'ltr';
+    row.innerHTML = `<div class="bubble" dir="${dir}">${render(text)}${meta}</div>`;
+    chat.appendChild(row);
+    chat.scrollTop = chat.scrollHeight;
+  }
+  function setTyping(on) {
+    statusEl.textContent = on ? 'מקליד/ה…' : 'חשבון עסקי';
+    statusEl.classList.toggle('typing', on);
+    let t = document.getElementById('typingrow');
+    if (on && !t) {
+      t = document.createElement('div');
+      t.id = 'typingrow';
+      t.className = `row in typingrow${lastRole !== 'assistant' ? ' first' : ''}`;
+      t.innerHTML = '<div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+      chat.appendChild(t);
+      chat.scrollTop = chat.scrollHeight;
+    } else if (!on && t) t.remove();
+  }
+  async function typeIntoComposer(text) {
+    ph.hidden = true; caret.hidden = false; composer.classList.add('has-text');
+    typedEl.textContent = '';
+    for (const ch of text) { typedEl.textContent += ch; await sleep(28 + Math.random() * 30); }
+    await sleep(350);
+    typedEl.textContent = ''; caret.hidden = true; ph.hidden = false; composer.classList.remove('has-text');
+  }
+  async function playTurn(turn) {
+    await typeIntoComposer(turn.user);
+    addBubble('user', turn.user);
+    await sleep(600);
+    setTyping(true);
+    await sleep(Math.min(3200, 1100 + turn.bot.length * 6));
+    setTyping(false);
+    clockMin += 1;
+    addBubble('assistant', turn.bot);
+  }
+
+  const progress = Object.fromEntries(convos.map((c) => [c.id, 0]));
+  function showChips() {
+    chips.innerHTML = '';
+    const next = [];
+    const fresh = [];
+    for (const c of convos) {
+      const i = progress[c.id];
+      if (i > 0 && i < c.turns.length) next.push({ c, i });
+      else if (i === 0) fresh.push({ c, i });
+    }
+    const list = [...next, ...fresh];
+    if (list.length === 0) for (const c of convos) { progress[c.id] = 0; list.push({ c, i: 0 }); }
+    chipLabel.textContent = next.length ? 'המשיכו את השיחה, או נסו נושא אחר:' : 'בחרו הודעה כדי לנסות:';
+    for (const { c, i } of list) {
+      const b = document.createElement('button');
+      b.className = `chip${i > 0 ? ' next' : ''}`;
+      b.textContent = c.turns[i].user;
+      b.onclick = async () => {
+        if (busy) return;
+        busy = true; chips.classList.add('hidden'); chipLabel.hidden = true;
+        await playTurn(c.turns[i]);
+        progress[c.id] = i + 1;
+        busy = false; chips.classList.remove('hidden'); chipLabel.hidden = false;
+        showChips();
+      };
+      chips.appendChild(b);
+    }
+    chips.scrollLeft = chips.scrollWidth;
+  }
+
+  // ?play=<id> plays one conversation by itself (used to record the videos).
+  const play = params.get('play');
+  if (play) {
+    chips.classList.add('hidden'); chipLabel.hidden = true;
+    const c = convos.find((x) => x.id === play);
+    await sleep(900);
+    for (const t of c?.turns ?? []) { await playTurn(t); await sleep(2600); }
+    document.body.dataset.done = '1';
+  } else {
+    showChips();
+  }
+})();
+</script>
+</body>
+</html>
