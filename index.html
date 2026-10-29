@@ -33,7 +33,7 @@
   body { background: #e9edef; }
 
   /* Desktop: the chat sits in a phone, with a short explanation beside it. */
-  .stage { min-height: 100%; display: flex; align-items: center; justify-content: center; gap: 64px; padding: 32px; }
+  .stage { min-height: 100%; display: flex; align-items: center; justify-content: center; gap: 64px; padding: 20px 32px; }
   .side { max-width: 340px; }
   .side .logo { width: 56px; height: 56px; border-radius: 14px; display: block; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(26,14,34,.18); }
   .side h1 { font-size: 30px; line-height: 1.2; margin: 0 0 12px; letter-spacing: -.3px; }
@@ -41,26 +41,30 @@
   .side .hint { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; background: #fff; border-radius: 999px; padding: 8px 14px; font-size: 14px; color: #3b4a54; box-shadow: 0 1px 2px rgba(11,20,26,.12); }
   .side .hint i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 1.6s infinite; }
   .side .fine { font-size: 12.5px; color: var(--muted); margin-top: 22px; }
+  .side .caps { list-style: none; margin: 14px 0 8px; padding: 0; }
+  .side .caps li { position: relative; padding: 7px 22px 7px 0; font-size: 15px; color: #111b21; border-bottom: 1px solid #dde2e5; }
+  .side .caps li::before { content: ""; position: absolute; right: 0; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
   @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 
-  .device { width: 390px; height: 844px; border-radius: 56px; background: #0b0b0c; padding: 12px; box-shadow: 0 30px 60px rgba(11,20,26,.28), inset 0 0 0 2px #2a2a2c; position: relative; flex: none; }
+  .device { height: min(844px, calc(100dvh - 40px)); aspect-ratio: 390 / 844; width: auto; border-radius: 56px; background: #0b0b0c; padding: 12px; box-shadow: 0 30px 60px rgba(11,20,26,.28), inset 0 0 0 2px #2a2a2c; position: relative; flex: none; }
   .screen { width: 100%; height: 100%; border-radius: 44px; overflow: hidden; position: relative; display: flex; flex-direction: column; background: var(--wall); }
   .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 122px; height: 34px; border-radius: 20px; background: #000; z-index: 5; }
   .statusbar { height: 50px; flex: none; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 30px 6px; background: var(--bar); font-size: 15px; font-weight: 600; direction: ltr; }
   .statusbar .icons { display: flex; gap: 6px; align-items: center; }
 
+  @media (max-width: 980px) and (min-width: 761px) { .side { display: none; } }
   /* Phone-size browser: the chat is the page. */
   @media (max-width: 760px) {
-    body { background: var(--wall); }
-    .stage { padding: 0; display: block; }
+    html, body { background: var(--wall); overflow: hidden; height: 100dvh; }
+    .stage { padding: 0; display: block; min-height: 0; }
     .side { display: none; }
-    .device { width: 100%; height: 100dvh; border-radius: 0; padding: 0; box-shadow: none; }
+    .device { width: 100%; height: 100dvh; aspect-ratio: auto; border-radius: 0; padding: 0; box-shadow: none; }
     .screen { border-radius: 0; }
     .island, .statusbar { display: none; }
   }
   body.bare .side, body.bare .island { display: none; }
   body.bare .stage { padding: 0; }
-  body.bare .device { border-radius: 0; padding: 0; box-shadow: none; height: 100dvh; width: 100vw; max-width: 430px; }
+  body.bare .device { border-radius: 0; padding: 0; box-shadow: none; height: 100dvh; width: 100vw; max-width: 430px; aspect-ratio: auto; }
   body.bare .screen { border-radius: 0; }
 
   header { display: flex; align-items: center; gap: 10px; padding: 6px 10px 8px; background: var(--bar); border-bottom: 1px solid #e3e6e8; flex: none; }
@@ -102,24 +106,25 @@
   .bubble b { font-weight: 600; }
   .meta { float: inline-end; margin-inline-start: 10px; margin-top: 7px; margin-bottom: -4px; font-size: 11px; color: var(--muted); direction: ltr; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
   .meta svg { color: var(--tick); }
-  .preview { display: block; margin: -2px -4px 6px; border-radius: 6px; overflow: hidden; background: #f5f6f6; color: inherit; text-decoration: none; }
+  .preview { display: flex; gap: 0; margin: -2px -4px 6px; border-radius: 6px; overflow: hidden; background: #f5f6f6; color: inherit; text-decoration: none; min-height: 84px; }
   .out .preview { background: #c9eec2; }
-  .preview img { width: 100%; height: 150px; object-fit: cover; display: block; }
-  .preview .pt { padding: 6px 9px 8px; }
-  .preview .pt b { display: block; font-size: 14px; color: var(--text); font-weight: 600; }
+  .preview img { width: 84px; height: auto; min-height: 84px; object-fit: cover; display: block; flex: none; }
+  .preview .pt { padding: 7px 10px 7px; min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .preview .pt b { display: block; font-size: 14px; color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .preview .pt span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; white-space: normal; }
-  .preview .pt em { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 3px; direction: ltr; text-align: end; }
+  .preview .pt em { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 3px; }
 
   .typingrow .bubble { display: inline-flex; gap: 4px; align-items: center; padding: 12px 13px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #8696a0; animation: blink 1.2s infinite; }
   .dot:nth-child(2) { animation-delay: .2s; } .dot:nth-child(3) { animation-delay: .4s; }
   @keyframes blink { 0%, 80%, 100% { opacity: .3 } 40% { opacity: 1 } }
 
-  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 10px 2px; background: var(--wall); flex: none; scrollbar-width: none; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 6px 10px 4px; background: var(--wall); flex: none; justify-content: flex-start; }
   .chips::-webkit-scrollbar { display: none; }
-  .chip { flex: none; border: 1px solid #d1d7db; background: #fff; color: #008069; font: inherit; font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 18px; cursor: pointer; box-shadow: 0 1px .5px rgba(11,20,26,.08); white-space: nowrap; }
+  .chip { max-width: 100%; border: 1px solid #d1d7db; background: #fff; color: #008069; font: inherit; font-size: 13.5px; font-weight: 500; padding: 7px 13px; border-radius: 18px; cursor: pointer; box-shadow: 0 1px .5px rgba(11,20,26,.08); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: start; }
   .chip:hover { background: #f5fbf9; }
   .chip.next { background: #008069; color: #fff; border-color: #008069; }
+  .chip.more { color: #54656f; background: #f7f8fa; }
   .chips.hidden { display: none; }
   .chiplabel { font-size: 12px; color: var(--muted); padding: 6px 14px 0; background: var(--wall); flex: none; }
 
@@ -172,7 +177,7 @@
           <div>כרטיסים למסיבות, פסטיבלים והופעות<br>חשבון עסקי · עוזר אוטומטי</div>
         </div>
       </main>
-      <div class="chiplabel" id="chiplabel">בחרו הודעה כדי לנסות:</div>
+      <div class="chiplabel" id="chiplabel">בחרו נושא ותראו איך הסוכן עונה:</div>
       <div class="chips" id="chips"></div>
       <footer id="composer">
         <span class="plus" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
@@ -186,11 +191,16 @@
   </div>
   <aside class="side">
     <img class="logo" src="assets/avatar.jpg" alt="">
-    <h1>סוכן וואטסאפ<br>חכם לעסק</h1>
-    <p>ככה נראית שיחה עם הסוכן של Layla: הוא מוצא אירועים, עונה על שאלות, שולח קוד הנחה ולינק לקנייה, ומזהה לקוחות קיימים.</p>
-    <p>בחרו הודעה מתחתית הצ׳אט וראו איך הוא עונה.</p>
-    <span class="hint"><i></i> התשובות הן של הסוכן עצמו</span>
-    <p class="fine">הדגמה: האירועים והמחירים אמיתיים מהאתר של Layla. קודי ההנחה והלקוחה הם לדוגמה.</p>
+    <h1>סוכן וואטסאפ<br>שמוכר בשבילכם</h1>
+    <p>זה הסוכן של Layla. הוא מכיר כל לקוח לפי המספר, ממליץ לפי מה שהוא אוהב, שולח הנחה ולינק לקנייה, ועונה תוך שניות, בכל שעה.</p>
+    <ul class="caps">
+      <li>מזהה לקוחות חוזרים, ההיסטוריה וההטבות שלהם</li>
+      <li>ממליץ ומוכר: הנחה ולינק לקנייה בתוך הצ׳אט</li>
+      <li>עונה על כל שאלה על האירוע</li>
+      <li>מעביר לנציג כשצריך, ולא ממציא כלום</li>
+    </ul>
+    <span class="hint"><i></i> בחרו הודעה בתחתית הצ׳אט</span>
+    <p class="fine">הדגמה: האירועים והמחירים אמיתיים מהאתר של Layla. הלקוחה, ההיסטוריה שלה וקודי ההנחה הם לדוגמה.</p>
   </aside>
 </div>
 <script>
@@ -201,7 +211,13 @@
     fetch('conversations.json').then((r) => r.json()),
     fetch('assets/banners/meta.json').then((r) => r.json()),
   ]);
-  const ORDER = ['1-weekend', '2-discount', '3-festival', '4-my-tickets', '5-support', '6-english'];
+  const ORDER = ['3-returning', '1-weekend', '2-group', '4-gift', '6-festival', '5-my-tickets', '7-support', '8-english'];
+  // Short topic labels for the first message; the full message is what gets typed.
+  const TOPIC = {
+    '3-returning': 'לקוחה חוזרת ו-VIP', '1-weekend': 'מה יש בסופ״ש?', '2-group': 'קבוצה של 4 + הנחה',
+    '4-gift': 'כרטיס מתנה לחבר', '6-festival': 'פסטיבל המכתש', '5-my-tickets': 'איפה הכרטיסים שלי?',
+    '7-support': 'חיוב כפול', '8-english': 'English',
+  };
   convos.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
 
   const chat = document.getElementById('chat');
@@ -249,7 +265,13 @@
     const dir = /[\u05D0-\u05EA]/.test(text) ? 'rtl' : 'ltr';
     row.innerHTML = `<div class="bubble" dir="${dir}">${render(text)}${meta}</div>`;
     chat.appendChild(row);
-    chat.scrollTop = chat.scrollHeight;
+    const place = () => {
+      // A long reply is read from its first line, like WhatsApp; a short one just sits at the bottom.
+      const top = row.offsetTop - chat.offsetTop - 8;
+      chat.scrollTop = row.offsetHeight > chat.clientHeight - 16 ? top : chat.scrollHeight;
+    };
+    place();
+    for (const img of row.querySelectorAll('img')) if (!img.complete) img.addEventListener('load', place, { once: true });
   }
   function setTyping(on) {
     statusEl.textContent = on ? 'מקליד/ה…' : 'חשבון עסקי';
@@ -292,13 +314,17 @@
       if (i > 0 && i < c.turns.length) next.push({ c, i });
       else if (i === 0) fresh.push({ c, i });
     }
-    const list = [...next, ...fresh];
+    const MAX_FRESH = next.length ? 0 : 4;
+    const showAll = chips.dataset.all === '1';
+    const list = [...next.slice(0, 1), ...(showAll ? fresh : fresh.slice(0, MAX_FRESH))];
+    const hiddenCount = fresh.length - (showAll ? fresh.length : Math.min(fresh.length, MAX_FRESH));
     if (list.length === 0) for (const c of convos) { progress[c.id] = 0; list.push({ c, i: 0 }); }
-    chipLabel.textContent = next.length ? 'המשיכו את השיחה, או נסו נושא אחר:' : 'בחרו הודעה כדי לנסות:';
+    chipLabel.textContent = next.length ? 'המשיכו את השיחה, או נסו נושא אחר:' : 'בחרו נושא ותראו איך הסוכן עונה:';
     for (const { c, i } of list) {
       const b = document.createElement('button');
       b.className = `chip${i > 0 ? ' next' : ''}`;
-      b.textContent = c.turns[i].user;
+      b.textContent = i > 0 ? c.turns[i].user : TOPIC[c.id] || c.title;
+      b.title = c.turns[i].user;
       b.onclick = async () => {
         if (busy) return;
         busy = true; chips.classList.add('hidden'); chipLabel.hidden = true;
@@ -309,7 +335,14 @@
       };
       chips.appendChild(b);
     }
-    chips.scrollLeft = chips.scrollWidth;
+    if (hiddenCount > 0) {
+      const more = document.createElement('button');
+      more.className = 'chip more';
+      more.textContent = next.length ? 'נושא אחר…' : `עוד ${hiddenCount} נושאים…`;
+      more.onclick = () => { chips.dataset.all = '1'; showChips(); };
+      chips.appendChild(more);
+    }
+    chips.dataset.all = '';
   }
 
   // ?play=<id> plays one conversation by itself (used to record the videos).
